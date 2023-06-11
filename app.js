@@ -57,6 +57,22 @@ app.post("/register", (req, res) => {
       console.error(error);
     });
 });
+app.post("/login", (req, res) => {
+  const password = req.body.password;
+  const emial = req.body.username;
+  User.findOne({ emial: emial, password: password })
+    .then((user) => {
+      if (user.password === password && user.emial === emial) {
+        res.render("secrets");
+      } else {
+        res.send("Invalid login or password"); // or redirect to a login error page
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send("An error occurred"); // or redirect to an error page
+    });
+});
 
 app.listen(3000, function () {
   console.log("server is connected");
