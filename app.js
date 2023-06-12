@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
-
+const encrypt = require("mongoose-encryption");
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,15 +16,23 @@ mongoose
 
 // create Schema : rools
 const userSchema = new mongoose.Schema({
-  emial: String,
+  email: String,
   password: String,
 });
+
+const encKey = "Thisisourlittlesecret.";
+
+userSchema.plugin(encrypt, {
+  secret: encKey,
+
+  encryptedFields: ["password"],
+});
+
 // create model
 const User = mongoose.model("User", userSchema);
 
-// create object to insert to database
 // const Adam = new User({
-//   name: "Adam",
+//   password: "Adam",
 //   email: "snn@o2.pl",
 // });
 
@@ -43,7 +51,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const newUser = new User({
-    emial: req.body.username,
+    email: req.body.username,
     password: req.body.password,
   });
   newUser
@@ -59,10 +67,10 @@ app.post("/register", (req, res) => {
 });
 app.post("/login", (req, res) => {
   const password = req.body.password;
-  const emial = req.body.username;
-  User.findOne({ emial: emial, password: password })
+  const email = req.body.username;
+  User.findOne({ email: email })
     .then((user) => {
-      if (user.password === password && user.emial === emial) {
+      if (user && user.password === password) {
         res.render("secrets");
       } else {
         res.send("Invalid login or password"); // or redirect to a login error page
