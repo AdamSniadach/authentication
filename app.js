@@ -1,4 +1,5 @@
 //jshint esversion:6
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -20,10 +21,13 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-const encKey = "Thisisourlittlesecret.";
-
 userSchema.plugin(encrypt, {
-  secret: encKey,
+  //import dotenv
+  // create file .env
+  //get key in process.env.ENCKEY
+  //create gitignore
+  // copy node template
+  secret: process.env.ENCKEY,
 
   encryptedFields: ["password"],
 });
