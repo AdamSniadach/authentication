@@ -5,9 +5,11 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
-const encrypt = require("mongoose-encryption");
+//require md5
+const md5 = require("md5");
 app.use(express.static("public"));
 app.set("view engine", "ejs");
+
 app.use(bodyParser.urlencoded({ extended: true }));
 const uri = "mongodb://0.0.0.0:27017/usersDB";
 mongoose
@@ -19,17 +21,6 @@ mongoose
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
-});
-
-userSchema.plugin(encrypt, {
-  //import dotenv
-  // create file .env
-  //get key in process.env.ENCKEY
-  //create gitignore
-  // copy node template
-  secret: process.env.ENCKEY,
-
-  encryptedFields: ["password"],
 });
 
 // create model
@@ -56,7 +47,8 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const newUser = new User({
     email: req.body.username,
-    password: req.body.password,
+    // ADD MD5 TO PASSWORD
+    password: md5(req.body.password),
   });
   newUser
     .save()
@@ -70,7 +62,8 @@ app.post("/register", (req, res) => {
     });
 });
 app.post("/login", (req, res) => {
-  const password = req.body.password;
+  //add md5 to password
+  const password = md5(req.body.password);
   const email = req.body.username;
   User.findOne({ email: email })
     .then((user) => {
