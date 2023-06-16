@@ -69,6 +69,20 @@ app.get("/secrets", (req, res) => {
     res.redirect("/login");
   }
 });
+//!step9: add log out
+app.get("/logout", (req, res) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    var params = {
+      client_id: process.env["AUTH0_CLIENT_ID"],
+      returnTo: "http://localhost:3000/",
+    };
+    res.redirect("/login");
+  });
+});
+
 //!step6 : set up register
 app.post("/register", (req, res) => {
   User.register(
